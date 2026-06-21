@@ -9,7 +9,7 @@ import {
   getEntitiesByCategory,
   getAvailableSlots,
 } from '../controllers/appointmentController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { protect } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 

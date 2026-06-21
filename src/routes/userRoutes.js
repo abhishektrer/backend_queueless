@@ -4,7 +4,7 @@ import {
   getUserProfile,
   updateUserProfile,
 } from '../controllers/userController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { protect } from '../middleware/auth.middleware.js'; // NEW JWT middleware
 import { aiChatAssistant } from '../controllers/aiChatController.js';
 import {
   getNotificationSettings,
@@ -16,10 +16,10 @@ import {
 
 const router = express.Router();
 
-// Public routes
+// DEPRECATED: Old Firebase auth endpoint (keep for backward compatibility)
 router.post('/auth', authUser);
 
-// Protected routes
+// Protected routes (using JWT middleware)
 router.get('/profile', protect, getUserProfile);
 router.put('/profile', protect, updateUserProfile);
 
