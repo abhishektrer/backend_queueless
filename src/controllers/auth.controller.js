@@ -206,13 +206,21 @@ export const googleAuth = async (req, res) => {
   try {
     const { firebaseUid, name, email, photoURL } = req.body;
 
-    console.log('🔐 Google Auth Request:', { firebaseUid, email });
+    console.log('🔐 Google Auth Request:', { firebaseUid, email, name });
 
-    // Validation
-    if (!firebaseUid || !email) {
+    // Validation - firebaseUid is required
+    if (!firebaseUid) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required Google authentication data',
+        message: 'Missing Firebase user ID',
+      });
+    }
+
+    // Email validation - provide user-friendly error if missing
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'This Google account has no email address. Please use a Google account with an email address.',
       });
     }
 
