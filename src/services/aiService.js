@@ -4,13 +4,24 @@ let groqClient;
 
 // Initialize Groq AI
 export const initializeGeminiAI = () => {
-  if (process.env.GROQ_API_KEY && process.env.GROQ_API_KEY !== 'your_groq_api_key_here') {
+  try {
+    if (!process.env.GROQ_API_KEY) {
+      console.warn('⚠️ GROQ_API_KEY not set - Using fallback AI calculations');
+      return;
+    }
+    
+    if (process.env.GROQ_API_KEY === 'your_groq_api_key_here') {
+      console.warn('⚠️ GROQ_API_KEY is placeholder - Using fallback AI calculations');
+      return;
+    }
+
     groqClient = new Groq({
       apiKey: process.env.GROQ_API_KEY,
     });
     console.log('✅ Groq AI initialized with model:', process.env.GROQ_MODEL || 'llama-3.1-8b-instant');
-  } else {
-    console.log('⚠️ Groq API key not configured - AI features using fallback calculations');
+  } catch (error) {
+    console.error('❌ Groq AI initialization error:', error.message);
+    console.warn('⚠️ Using fallback AI calculations');
   }
 };
 

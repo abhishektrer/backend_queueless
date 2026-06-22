@@ -15,14 +15,45 @@ import adminRoutes from './routes/adminRoutes.js';
 // Load environment variables
 dotenv.config();
 
-// Initialize Firebase Admin (still needed for admin operations)
-initializeFirebase();
+console.log('🔧 Starting QueueLess AI Backend...');
+console.log('📍 Node Environment:', process.env.NODE_ENV || 'development');
+console.log('🔑 Checking required environment variables...');
 
-// Initialize Gemini AI
-initializeGeminiAI();
+// Check critical environment variables
+const requiredVars = ['MONGODB_URI', 'JWT_SECRET', 'FRONTEND_URL'];
+const missingVars = requiredVars.filter(varName => !process.env[varName]);
+
+if (missingVars.length > 0) {
+  console.error('❌ Missing required environment variables:', missingVars.join(', '));
+  console.error('⚠️ Server may not function correctly!');
+} else {
+  console.log('✅ All critical environment variables present');
+}
+
+// Initialize Firebase Admin (still needed for admin operations)
+console.log('🔥 Initializing Firebase Admin SDK...');
+try {
+  initializeFirebase();
+} catch (error) {
+  console.error('❌ Firebase initialization failed:', error.message);
+  console.warn('⚠️ Server will continue but Google Auth will not work');
+}
+
+// Initialize Groq AI
+console.log('🤖 Initializing Groq AI...');
+try {
+  initializeGeminiAI();
+} catch (error) {
+  console.error('❌ Groq AI initialization failed:', error.message);
+  console.warn('⚠️ Server will continue with fallback AI calculations');
+}
 
 // Connect to MongoDB
-connectDB();
+console.log('🗄️ Connecting to MongoDB...');
+connectDB().catch(err => {
+  console.error('❌ Fatal: MongoDB connection failed:', err.message);
+  process.exit(1);
+});
 
 const app = express();
 const server = createServer(app);
@@ -46,10 +77,16 @@ app.get('/', (req, res) => {
 });
 
 // Mount routes
+console.log('🛣️ Mounting API routes...');
 app.use('/api/auth', authRoutes); // NEW: Authentication routes
 app.use('/api/users', userRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/admin', adminRoutes);
+console.log('✅ Routes mounted successfully:');
+console.log('   - /api/auth (register, login, google, logout, me, profile)');
+console.log('   - /api/users');
+console.log('   - /api/appointments');
+console.log('   - /api/admin');
 
 // Error handling middleware
 app.use((err, req, res, next) => {
