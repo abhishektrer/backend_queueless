@@ -204,9 +204,9 @@ export const login = async (req, res) => {
  */
 export const googleAuth = async (req, res) => {
   try {
-    const { firebaseUid, name, email, photoURL } = req.body;
+    const { firebaseUid, name, email: reqEmail, photoURL } = req.body;
 
-    console.log('🔐 Google Auth Request:', { firebaseUid, email, name });
+    console.log('🔐 Google Auth Request:', { firebaseUid, reqEmail, name });
 
     // Validation - firebaseUid is required
     if (!firebaseUid) {
@@ -216,12 +216,11 @@ export const googleAuth = async (req, res) => {
       });
     }
 
-    // Email validation - provide user-friendly error if missing
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: 'This Google account has no email address. Please use a Google account with an email address.',
-      });
+    // Email handling - use placeholder if genuinely missing
+    const email = reqEmail || `${firebaseUid}@google-noemail.com`;
+    
+    if (!reqEmail) {
+      console.warn('⚠️ No email provided, using placeholder:', email);
     }
 
     // Check if user exists by email
